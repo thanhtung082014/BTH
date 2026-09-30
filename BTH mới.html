@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Tuần Hoàn Tương Tác - Hóa Học 10</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        alkali: '#f87171',      // Kim loại kiềm (Red-400)
+                        alkaline: '#fb923c',   // Kiềm thổ (Orange-400)
+                        transition: '#facc15', // Chuyển tiếp (Yellow-400)
+                        posttransition: '#4ade80', // Kim loại sau chuyển tiếp (Green-400)
+                        metalloid: '#2dd4bf',  // Á kim (Teal-400)
+                        nonmetal: '#38bdf8',   // Phi kim (Sky-400)
+                        halogen: '#818cf8',    // Halogen (Indigo-400)
+                        noble: '#c084fc',      // Khí hiếm (Purple-400)
+                        lanthanide: '#f472b6', // Lantan (Pink-400)
+                        actinide: '#fb7185',   // Actini (Rose-400)
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(20px, 1.5vw, 30px);
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .element-symbol {
+            font-size: clamp(26px, 2.4vw, 44px);
+        }
+
+        .element-content {
+            font-size: clamp(14px, 1.1vw, 20px);
+        }
+
+        /* Custom scrollbar for periodic table grid container */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .periodic-grid {
+            display: grid;
+            grid-template-columns: repeat(18, minmax(65px, 1fr));
+            grid-template-rows: repeat(10, minmax(75px, auto));
+            gap: 4px;
+        }
+
+        @media (max-width: 1280px) {
+            .periodic-grid {
+                grid-template-columns: repeat(18, minmax(50px, 1fr));
+                grid-template-rows: repeat(10, minmax(60px, auto));
+                gap: 3px;
+            }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col selection:bg-cyan-500 selection:text-white">
+
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 py-3 shadow-lg">
+        <div class="max-w-[1700px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-cyan-500 to-blue-600 p-2.5 rounded-2xl shadow-md text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round5" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl lg:text-2xl font-bold tracking-wide bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
+                        BẢNG TUẦN HOÀN TƯƠNG TÁC – HÓA HỌC 10
+                    </h1>
+                    <p class="text-xs text-slate-400">Chương trình chuẩn SGK Việt Nam • 118 Nguyên tố • Nhóm A & Nhóm B</p>
+                </div>
+            </div>
+
+            <!-- Search and Quick Tool Controls -->
+            <div class="flex flex-wrap items-center justify-center gap-3 w-full lg:w-auto">
+                <div class="relative flex-1 lg:w-72">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                        🔍
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Tìm tên, kí hiệu, Z..." 
+                        class="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm">
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="filterGroupType('A')" id="btnGroupA" class="px-3.5 py-2 bg-blue-600/80 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold transition border border-blue-500/50 shadow">
+                        🔵 NHÓM A
+                    </button>
+                    <button onclick="filterGroupType('B')" id="btnGroupB" class="px-3.5 py-2 bg-amber-600/80 hover:bg-amber-600 text-white rounded-xl text-sm font-semibold transition border border-amber-500/50 shadow">
+                        🟠 NHÓM B
+                    </button>
+                    <button onclick="toggleElectronegativityMode()" id="btnElectronegativity" class="px-3.5 py-2 bg-purple-600/80 hover:bg-purple-600 text-white rounded-xl text-sm font-semibold transition border border-purple-500/50 shadow">
+                        ⚡ ĐỘ ÂM ĐIỆN
+                    </button>
+                    <button onclick="openCompareModal()" class="px-3.5 py-2 bg-emerald-600/80 hover:bg-emerald-600 text-white rounded-xl text-sm font-semibold transition border border-emerald-500/50 shadow">
+                        ⚖️ SO SÁNH
+                    </button>
+                    <button onclick="openQuizModal()" class="px-3.5 py-2 bg-rose-600/80 hover:bg-rose-600 text-white rounded-xl text-sm font-semibold transition border border-rose-500/50 shadow animate-pulse">
+                        📚 NHIỆM VỤ
+                    </button>
+                    <button onclick="resetFilters()" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-xl text-sm transition" title="Đặt lại hiển thị">
+                        🔄
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="bg-slate-900/60 border-b border-slate-800/80 py-2.5 px-4 text-xs">
+        <div class="max-w-[1700px] mx-auto flex flex-wrap items-center justify-between gap-3">
+            <!-- Group Legend -->
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-slate-400 font-medium mr-1">Phân loại:</span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/60 border border-red-800/50 text-red-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-alkali"></span> Kim loại kiềm (IA)
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-950/60 border border-orange-800/50 text-orange-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-alkaline"></span> Kiềm thổ (IIA)
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-950/60 border border-yellow-800/50 text-yellow-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-transition"></span> Kim loại chuyển tiếp (Nhóm B)
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-800/50 text-emerald-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-posttransition"></span> Kim loại sau chuyển tiếp
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-950/60 border border-teal-800/50 text-teal-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-metalloid"></span> Á kim
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-950/60 border border-sky-800/50 text-sky-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-nonmetal"></span> Phi kim
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-950/60 border border-indigo-800/50 text-indigo-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-halogen"></span> Halogen (VIIA)
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-950/60 border border-purple-800/50 text-purple-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-noble"></span> Khí hiếm (VIIIA)
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pink-950/60 border border-pink-800/50 text-pink-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-lanthanide"></span> Họ Lantan
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-950/60 border border-rose-800/50 text-rose-300">
+                    <span class="w-2.5 h-2.5 rounded-full bg-actinide"></span> Họ Actini
+                </span>
+            </div>
+            <div id="modeStatus" class="text-cyan-400 font-semibold px-3 py-1 bg-cyan-950/50 rounded-lg border border-cyan-800/40 hidden">
+                ⚡ Đang bật chế độ hiển thị Độ âm điện Pauling
+            </div>
+        </div>
+    </div>
+
+    <main class="flex-1 overflow-auto p-4 lg:p-6 flex flex-col items-center">
+        <div class="w-full max-w-[1700px] overflow-x-auto pb-6">
+            <div id="periodicTableContainer" class="periodic-grid min-w-[1250px]">
+                <!-- Periodic table cells generated dynamically via JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <div id="detailModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div id="modalZBadge" class="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center text-cyan-400 font-bold text-2xl">
+                        1
+                    </div>
+                    <div>
+                        <h2 id="modalElementName" class="text-2xl lg:text-3xl font-extrabold text-white">Hydrogen</h2>
+                        <p id="modalElementSub" class="text-sm text-slate-400">Kí hiệu: <span class="text-cyan-400 font-bold">H</span> • Nguyên tử khối: <span class="text-white font-semibold">1.008</span></p>
+                    </div>
+                </div>
+                <button onclick="closeDetailModal()" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xl transition">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Modal Body Content -->
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- Grid of quick attributes -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-3.5 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">Chu kì</span>
+                        <span id="modalPeriod" class="text-lg font-bold text-cyan-300">Chu kì 1</span>
+                    </div>
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-3.5 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">Nhóm (A/B)</span>
+                        <span id="modalGroup" class="text-lg font-bold text-amber-300">Nhóm IA</span>
+                    </div>
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-3.5 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">Block</span>
+                        <span id="modalBlock" class="text-lg font-bold text-purple-300">Block s</span>
+                    </div>
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-3.5 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">Độ âm điện (Pauling)</span>
+                        <span id="modalElectronegativity" class="text-lg font-bold text-emerald-300">2.20</span>
+                    </div>
+                </div>
+
+                <!-- Detailed Electronic Configuration & Reasoning Flow -->
+                <div class="bg-slate-800/40 border border-slate-700/80 p-5 rounded-2xl space-y-4">
+                    <h3 class="text-base font-bold text-cyan-400 flex items-center gap-2">
+                        ⚛️ Cấu hình electron và vị trí trong Bảng tuần hoàn
+                    </h3>
+                    
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                        <div class="text-xs text-slate-400 mb-1">Cấu hình electron chuẩn (Unicode):</div>
+                        <div id="modalConfig" class="text-xl font-mono font-bold text-amber-300 tracking-wider">1s¹</div>
+                    </div>
+
+                    <!-- Step-by-step reasoning diagram (Z -> Config -> Layers -> Period -> Block -> Group) -->
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 pt-2">
+                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/80 text-center">
+                            <span class="text-xs text-slate-400 block">Số hiệu Z</span>
+                            <span id="stepZ" class="font-bold text-white text-sm">Z = 1</span>
+                        </div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/80 text-center">
+                            <span class="text-xs text-slate-400 block">Số lớp e</span>
+                            <span id="stepLayers" class="font-bold text-cyan-300 text-sm">1 lớp</span>
+                        </div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/80 text-center">
+                            <span class="text-xs text-slate-400 block">Chu kì</span>
+                            <span id="stepPeriod" class="font-bold text-cyan-300 text-sm">Chu kì 1</span>
+                        </div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/80 text-center">
+                            <span class="text-xs text-slate-400 block">Phân lớp cuối</span>
+                            <span id="stepBlock" class="font-bold text-purple-300 text-sm">Block s</span>
+                        </div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/80 text-center">
+                            <span class="text-xs text-slate-400 block">Xác định Nhóm</span>
+                            <span id="stepGroup" class="font-bold text-amber-300 text-sm">Nhóm IA</span>
+                        </div>
+                    </div>
+                    <p id="modalReasoningText" class="text-xs text-slate-300 italic bg-cyan-950/30 p-3 rounded-xl border border-cyan-900/40">
+                        Giải thích vị trí nguyên tố...
+                    </p>
+                </div>
+
+                <!-- Properties Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">Electron lớp ngoài cùng</span>
+                        <span id="modalOuterE" class="text-base font-bold text-white">1 electron</span>
+                    </div>
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">Phân loại tính chất</span>
+                        <span id="modalType" class="text-base font-bold text-white">Phi kim</span>
+                    </div>
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">Trạng thái (ĐK thường)</span>
+                        <span id="modalState" class="text-base font-bold text-white">Khí</span>
+                    </div>
+                </div>
+
+                <!-- Oxidation States & Remember points -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-2 font-semibold text-cyan-400">Số oxi hóa phổ biến (Hóa 10)</span>
+                        <div id="modalOxidation" class="text-sm font-bold text-white bg-slate-900/60 p-2.5 rounded-xl border border-slate-700">
+                            0, +1, -1
+                        </div>
+                    </div>
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-2 font-semibold text-amber-400">💡 Điểm cần nhớ (Hóa 10)</span>
+                        <ul id="modalRememberList" class="text-xs text-slate-300 space-y-1.5 list-disc pl-4">
+                            <!-- Populated dynamically -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-900 px-6 py-3 border-t border-slate-800 flex justify-end">
+                <button onclick="closeDetailModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="compareModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-gradient-to-r from-emerald-900/60 to-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
+                    ⚖️️ Công Cụ So Sánh Hai Nguyên Tố
+                </h2>
+                <button onclick="closeCompareModal()" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xl transition">
+                    ✕
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- Selectors -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Chọn nguyên tố thứ 1:</label>
+                        <select id="compareSelect1" onchange="updateComparison()" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white font-semibold text-sm focus:outline-none focus:border-emerald-500">
+                            <!-- Options populated via JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Chọn nguyên tố thứ 2:</label>
+                        <select id="compareSelect2" onchange="updateComparison()" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white font-semibold text-sm focus:outline-none focus:border-emerald-500">
+                            <!-- Options populated via JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Comparison Table -->
+                <div class="overflow-x-auto border border-slate-700/80 rounded-2xl bg-slate-800/40">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-800 text-slate-300 text-xs uppercase tracking-wider border-b border-slate-700">
+                            <tr>
+                                <th class="p-3.5">Tiêu chí đối chiếu</th>
+                                <th id="compHeader1" class="p-3.5 text-cyan-400 font-bold">Nguyên tố 1</th>
+                                <th id="compHeader2" class="p-3.5 text-amber-400 font-bold">Nguyên tố 2</th>
+                            </tr>
+                        </thead>
+                        <tbody id="compareTableBody" class="divide-y divide-slate-700/60 text-slate-200">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Observation / Summary -->
+                <div class="bg-emerald-950/40 border border-emerald-900/60 p-4 rounded-2xl">
+                    <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">📝 Nhận xét chung & Liên hệ Hóa học 10</h4>
+                    <p id="compareObservation" class="text-xs text-slate-300 leading-relaxed">
+                        Chọn hai nguyên tố để xem nhận xét so sánh chi tiết về cấu hình, tính chất và độ âm điện.
+                    </p>
+                </div>
+            </div>
+            <div class="bg-slate-900 px-6 py-3 border-t border-slate-800 flex justify-end">
+                <button onclick="closeCompareModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quizModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-gradient-to-r from-rose-900/60 to-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-rose-400 flex items-center gap-2">
+                    📚 NHIỆM VỤ TỰ HỌC & KIỂM TRA HÓA 10
+                </h2>
+                <button onclick="closeQuizModal()" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xl transition">
+                    ✕
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- Quiz selector / list -->
+                <div class="flex items-center justify-between bg-slate-800/60 p-4 rounded-2xl border border-slate-700">
+                    <div>
+                        <span id="quizProgress" class="text-xs font-semibold text-rose-400 uppercase tracking-wider">Nhiệm vụ 1 / 10</span>
+                        <h3 id="quizTitle" class="text-base font-bold text-white mt-0.5">Tìm nguyên tố theo số hiệu Z</h3>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="prevQuiz()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold transition">Trước</button>
+                        <button onclick="nextQuiz()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold transition">Tiếp</button>
+                    </div>
+                </div>
+
+                <!-- Quiz Question Box -->
+                <div class="bg-slate-800/40 border border-slate-700/80 p-5 rounded-2xl space-y-4">
+                    <p id="quizQuestionText" class="text-base font-medium text-slate-200">
+                        Nguyên tố nào có số hiệu nguyên tử Z = 11?
+                    </p>
+
+                    <!-- Options container -->
+                    <div id="quizOptionsContainer" class="space-y-2.5">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Action and feedback -->
+                    <div class="flex items-center justify-between pt-2">
+                        <button onclick="checkQuizAnswer()" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-sm font-bold transition shadow-md">
+                            KIỂM TRA
+                        </button>
+                        <span id="quizFeedback" class="text-sm font-semibold"></span>
+                    </div>
+
+                    <div id="quizExplanationBox" class="hidden bg-slate-900/80 p-3.5 rounded-xl border border-slate-700 text-xs text-slate-300">
+                        <span class="font-bold text-cyan-400 block mb-1">💡 Giải thích:</span>
+                        <span id="quizExplanationText">...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-900 px-6 py-3 border-t border-slate-800 flex justify-end">
+                <button onclick="closeQuizModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Full dataset of 118 elements with precise Grade 10 chemistry data
+        const elementsData = [
+            { z: 1, symbol: "H", name: "Hydrogen", mass: "1.008", period: 1, group: "IA", block: "s", type: "Phi kim", state: "Khí", config: "1s¹", outerE: 1, ox: "0, +1, -1", en: 2.20, category: "nonmetal", rem: ["Nguyên tố nhẹ nhất trong vũ trụ.", "Chiếm phần lớn khối lượng mặt trời và các ngôi sao."] },
+            { z: 2, symbol: "He", name: "Helium", mass: "4.003", period: 1, group: "VIIIA", block: "s", type: "Khí hiếm", state: "Khí", config: "1s²", outerE: 2, ox: "0", en: null, category: "noble", rem: ["Thuộc nhóm khí hiếm dù chỉ có 2 electron lớp ngoài cùng.", "Trơ về mặt hóa học, không màu, không mùi."] },
+            { z: 3, symbol: "Li", name: "Lithium", mass: "6.94", period: 2, group: "IA", block: "s", type: "Kim loại kiềm", state: "Rắn", config: "1s² 2s¹", outerE: 1, ox: "0, +1", en: 0.98, category: "alkali", rem: ["Kim loại nhẹ nhất (nhẹ hơn nước).", "Dùng phổ biến trong pin Li-ion hiện đại."] },
+            { z: 4, symbol: "Be", name: "Beryllium", mass: "9.012", period: 2, group: "IIA", block: "s", type: "Kim loại kiềm thổ", state: "Rắn", config: "1s² 2s²", outerE: 2, ox: "0, +2", en: 1.57, category: "alkaline", rem: ["Kim loại kiềm thổ nhẹ, độc hại khi hít phải bụi.", "Tạo hợp kim bền nhẹ với nhôm."] },
+            { z: 5, symbol: "B", name: "Boron", mass: "10.81", period: 2, group: "IIIA", block: "p", type: "Á kim", state: "Rắn", config: "1s² 2s² 2p¹", outerE: 3, ox: "0, +3", en: 2.04, category: "metalloid", rem: ["Là chất bán dẫn quan trọng.", "Hợp chất borax dùng trong sản xuất thủy tinh."] },
+            { z: 6, symbol: "C", name: "Carbon", mass: "12.011", period: 2, group: "IVA", block: "p", type: "Phi kim", state: "Rắn", config: "1s² 2s² 2p²", outerE: 4, ox: "0, -4, +2, +4", en: 2.55, category: "nonmetal", rem: ["Nền tảng của hóa học hữu cơ và sự sống.", "Tồn tại ở các thù hình: kim cương, than chì, fullerene."] },
+            { z: 7, symbol: "N", name: "Nitrogen", mass: "14.007", period: 2, group: "VA", block: "p", type: "Phi kim", state: "Khí", config: "1s² 2s² 2p³", outerE: 5, ox: "0, -3, +2, +3, +4, +5", en: 3.04, category: "nonmetal", rem: ["Chiếm khoảng 78% thể tích khí quyển Trái Đất.", "Khí trơ ở nhiệt độ thường, cần thiết cho phân bón."] },
+            { z: 8, symbol: "O", name: "Oxygen", mass: "15.999", period: 2, group: "VIA", block: "p", type: "Phi kim", state: "Khí", config: "1s² 2s² 2p⁴", outerE: 6, ox: "0, -2, -1", en: 3.44, category: "nonmetal", rem: ["Độ âm điện lớn thứ hai sau Fluor (3.44).", "Thiết yếu cho sự hô hấp và sự cháy."] },
+            { z: 9, symbol: "F", name: "Fluorine", mass: "18.998", period: 2, group: "VIIA", block: "p", type: "Halogen", state: "Khí", config: "1s² 2s² 2p⁵", outerE: 7, ox: "0, -1", en: 3.98, category: "halogen", rem: ["Nguyên tố có độ âm điện lớn nhất trong BTH (3.98).", "Phi kim cực kỳ hoạt động và độc hại mạnh."] },
+            { z: 10, symbol: "Ne", name: "Neon", mass: "20.180", period: 2, group: "VIIIA", block: "p", type: "Khí hiếm", state: "Khí", config: "1s² 2s² 2p⁶", outerE: 8, ox: "0", en: null, category: "noble", rem: ["Phát sáng màu đỏ cam khi cho dòng điện chạy qua (biển quảng cáo).", "Hoàn toàn trơ về mặt hóa học."] },
+            { z: 11, symbol: "Na", name: "Sodium", mass: "22.990", period: 3, group: "IA", block: "s", type: "Kim loại kiềm", state: "Rắn", config: "[Ne] 3s¹", outerE: 1, ox: "0, +1", en: 0.93, category: "alkali", rem: ["Kim loại mềm, cắt bằng dao được, phản ứng mạnh với nước.", "Thành phần chính của muối ăn (NaCl)."] },
+            { z: 12, symbol: "Mg", name: "Magnesium", mass: "24.305", period: 3, group: "IIA", block: "s", type: "Kim loại kiềm thổ", state: "Rắn", config: "[Ne] 3s²", outerE: 2, ox: "0, +2", en: 1.31, category: "alkaline", rem: ["Cháy với ngọn lửa chói lọi trong không khí.", "Dùng trong chế tạo hợp kim hàng không nhẹ."] },
+            { z: 13, symbol: "Al", name: "Aluminum", mass: "26.982", period: 3, group: "IIIA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Ne] 3s² 3p¹", outerE: 3, ox: "0, +3", en: 1.61, category: "posttransition", rem: ["Kim loại phổ biến nhất trong vỏ Trái Đất.", "Nhẹ, bền, có lớp oxit bảo vệ bề mặt."] },
+            { z: 14, symbol: "Si", name: "Silicon", mass: "28.085", period: 3, group: "IVA", block: "p", type: "Á kim", state: "Rắn", config: "[Ne] 3s² 3p²", outerE: 4, ox: "0, -4, +4", en: 1.90, category: "metalloid", rem: ["Vật liệu nền tảng cho công nghiệp vi điện tử và chip bán dẫn.", "Phổ biến thứ hai trong vỏ Trái Đất (trong cát, thạch anh)."] },
+            { z: 15, symbol: "P", name: "Phosphorus", mass: "30.974", period: 3, group: "VA", block: "p", type: "Phi kim", state: "Rắn", config: "[Ne] 3s² 3p³", outerE: 5, ox: "0, -3, +3, +5", en: 2.19, category: "nonmetal", rem: ["Tồn tại ở các dạng thù hình: P đỏ, P trắng.", "Thiết yếu cho phân bón phosphate và DNA."] },
+            { z: 16, symbol: "S", name: "Sulfur", mass: "32.06", period: 3, group: "VIA", block: "p", type: "Phi kim", state: "Rắn", config: "[Ne] 3s² 3p⁴", outerE: 6, ox: "0, -2, +4, +6", en: 2.58, category: "nonmetal", rem: ["Chất rắn màu vàng, dùng sản xuất axit sulfuric (H₂SO₄).", "Có vai trò quan trọng trong lưu hóa cao su."] },
+            { z: 17, symbol: "Cl", name: "Chlorine", mass: "35.45", period: 3, group: "VIIA", block: "p", type: "Halogen", state: "Khí", config: "[Ne] 3s² 3p⁵", outerE: 7, ox: "0, -1, +1, +3, +5, +7", en: 3.16, category: "halogen", rem: ["Khí màu vàng lục, độc, dùng sát trùng nước sinh hoạt.", "Chất tẩy trắng mạnh."] },
+            { z: 18, symbol: "Ar", name: "Argon", mass: "39.948", period: 3, group: "VIIIA", block: "p", type: "Khí hiếm", state: "Khí", config: "[Ne] 3s² 3p⁶", outerE: 8, ox: "0", en: null, category: "noble", rem: ["Khí hiếm phổ biến nhất trong khí quyển Trái Đất (khoảng 0.93%).", "Dùng làm môi trường trơ trong hàn điện."] },
+            { z: 19, symbol: "K", name: "Potassium", mass: "39.098", period: 4, group: "IA", block: "s", type: "Kim loại kiềm", state: "Rắn", config: "[Ar] 4s¹", outerE: 1, ox: "0, +1", en: 0.82, category: "alkali", rem: ["Kim loại kiềm hoạt động mạnh hơn Na.", "Thiết yếu cho cây trồng (phân kali)."] },
+            { z: 20, symbol: "Ca", name: "Calcium", mass: "40.078", period: 4, group: "IIA", block: "s", type: "Kim loại kiềm thổ", state: "Rắn", config: "[Ar] 4s²", outerE: 2, ox: "0, +2", en: 1.00, category: "alkaline", rem: ["Thành phần chính của xương, răng và đá vôi (CaCO₃).", "Kim loại kiềm thổ phổ biến."] },
+            { z: 21, symbol: "Sc", name: "Scandium", mass: "44.956", period: 4, group: "IIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Ar] 3d¹ 4s²", outerE: 2, ox: "0, +3", en: 1.36, category: "transition", rem: ["Nguyên tố kim loại chuyển tiếp đầu tiên (chu kì 4).", "Hợp kim Sc-Al dùng trong ngành hàng không vũ trụ và thể thao cao cấp."] },
+            { z: 22, symbol: "Ti", name: "Titanium", mass: "47.867", period: 4, group: "IVB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Ar] 3d² 4s²", outerE: 2, ox: "0, +2, +3, +4", en: 1.54, category: "transition", rem: ["Kim loại cực kỳ bền, nhẹ, chống ăn mòn tuyệt vời.", "Dùng trong y tế (khớp nhân tạo) và hàng không."] },
+            { z: 23, symbol: "V", name: "Vanadium", mass: "50.942", period: 4, group: "VB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Ar] 3d³ 4s²", outerE: 2, ox: "0, +2, +3, +4, +5", en: 1.63, category: "transition", rem: ["Dùng làm tăng độ cứng và chịu lực cho thép hợp kim.", "Tạo ra các hợp chất có màu sắc đa dạng."] },
+            { z: 24, symbol: "Cr", name: "Chromium", mass: "51.996", period: 4, group: "VIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Ar] 3d⁵ 4s¹", outerE: 1, ox: "0, +2, +3, +6", en: 1.66, category: "transition", rem: ["Cấu hình ngoại lệ: 3d⁵ 4s¹ để đạt độ bền vững.", "Kim loại rất cứng, dùng mạ chống gỉ (inox, chrome)."] },
+            { z: 25, symbol: "Mn", name: "Manganese", mass: "54.938", period: 4, group: "VIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Ar] 3d⁵ 4s²", outerE: 2, ox: "0, +2, +3, +4, +6, +7", en: 1.55, category: "transition", rem: ["Thành phần không thể thiếu trong sản xuất thép.", "Có nhiều số oxi hóa từ +2 đến +7."] },
+            { z: 26, symbol: "Fe", name: "Iron", mass: "55.845", period: 4, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Ar] 3d⁶ 4s²", outerE: 2, ox: "0, +2, +3, +6", en: 1.83, category: "transition", rem: ["Kim loại quan trọng nhất trong nền công nghiệp hiện đại (thép, gang).", "Thành phần cốt lõi của hemoglobin trong máu."] },
+            { z: 27, symbol: "Co", name: "Cobalt", mass: "58.933", period: 4, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Ar] 3d⁷ 4s²", outerE: 2, ox: "0, +2, +3", en: 1.88, category: "transition", rem: ["Dùng tạo hợp kim siêu bền chịu nhiệt và chất xúc tác.", "Hợp chất tạo màu xanh lam đặc trưng trong gốm sứ."] },
+            { z: 28, symbol: "Ni", name: "Nickel", mass: "58.693", period: 4, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Ar] 3d⁸ 4s²", outerE: 2, ox: "0, +2, +3", en: 1.91, category: "transition", rem: ["Kim loại có tính chống ăn mòn tốt.", "Dùng sản xuất tiền xu, hợp kim monel và pin sạc."] },
+            { z: 29, symbol: "Cu", name: "Copper", mass: "63.546", period: 4, group: "IB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Ar] 3d¹⁰ 4s¹", outerE: 1, ox: "0, +1, +2", en: 1.90, category: "transition", rem: ["Cấu hình ngoại lệ: 3d¹⁰ 4s¹.", "Dẫn điện và dẫn nhiệt cực tốt, dùng làm dây cáp điện."] },
+            { z: 30, symbol: "Zn", name: "Zinc", mass: "65.38", period: 4, group: "IIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Ar] 3d¹⁰ 4s²", outerE: 2, ox: "0, +2", en: 1.65, category: "transition", rem: ["Dùng mạ kẽm bảo vệ sắt thép chống gỉ (tôn mạ kẽm).", "Thành phần của hợp kim đồng thau (brass)."] },
+            { z: 31, symbol: "Ga", name: "Gallium", mass: "69.723", period: 4, group: "IIIA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Ar] 3d¹⁰ 4s² 4p¹", outerE: 3, ox: "0, +3", en: 1.81, category: "posttransition", rem: ["Có điểm nóng chảy rất thấp (29.8°C), chảy lỏng ngay trên bàn tay.", "Dùng trong nhiệt kế nhiệt độ cao và linh kiện bán dẫn."] },
+            { z: 32, symbol: "Ge", name: "Germanium", mass: "72.630", period: 4, group: "IVA", block: "p", type: "Á kim", state: "Rắn", config: "[Ar] 3d¹⁰ 4s² 4p²", outerE: 4, ox: "0, +2, +4", en: 2.01, category: "metalloid", rem: ["Vật liệu bán dẫn quan trọng trong giai đoạn đầu ngành điện tử.", "Dùng trong sợi quang học và quang phổ kế hồng ngoại."] },
+            { z: 33, symbol: "As", name: "Arsenic", mass: "74.922", period: 4, group: "VA", block: "p", type: "Á kim", state: "Rắn", config: "[Ar] 3d¹⁰ 4s² 4p³", outerE: 5, ox: "0, -3, +3, +5", en: 2.18, category: "metalloid", rem: ["Á kim nổi tiếng với tính độc mạnh (thạch tín).", "Ứng dụng trong hợp kim chì và chất bán dẫn."] },
+            { z: 34, symbol: "Se", name: "Selenium", mass: "78.971", period: 4, group: "VIA", block: "p", type: "Phi kim", state: "Rắn", config: "[Ar] 3d¹⁰ 4s² 4p⁴", outerE: 6, ox: "0, -2, +4, +6", en: 2.55, category: "nonmetal", rem: ["Có tính quang dẫn (dẫn điện khi chiếu sáng).", "Dùng trong sản xuất pin mặt trời và ngành quang điện tử."] },
+            { z: 35, symbol: "Br", name: "Bromine", mass: "79.904", period: 4, group: "VIIA", block: "p", type: "Halogen", state: "Lỏng", config: "[Ar] 3d¹⁰ 4s² 4p⁵", outerE: 7, ox: "0, -1, +1, +5", en: 2.96, category: "halogen", rem: ["Là chất lỏng màu đỏ nâu duy nhất ở điều kiện thường (cùng với Hg).", "Dễ bay hơi, hơi độc, mùi xốc."] },
+            { z: 36, symbol: "Kr", name: "Krypton", mass: "83.798", period: 4, group: "VIIIA", block: "p", type: "Khí hiếm", state: "Khí", config: "[Ar] 3d¹⁰ 4s² 4p⁶", outerE: 8, ox: "0, +2", en: 3.00, category: "noble", rem: ["Khí hiếm, phát sáng ánh sáng trắng mạnh trong đèn flash nhiếp ảnh.", "Hầu như trơ hóa học ở điều kiện thường."] },
+            { z: 37, symbol: "Rb", name: "Rubidium", mass: "85.468", period: 5, group: "IA", block: "s", type: "Kim loại kiềm", state: "Rắn", config: "[Kr] 5s¹", outerE: 1, ox: "0, +1", en: 0.82, category: "alkali", rem: ["Kim loại kiềm hoạt động mạnh, bốc cháy tự phát trong không khí ẩm.", "Dùng trong đồng hồ nguyên tử chính xác cao."] },
+            { z: 38, symbol: "Sr", name: "Strontium", mass: "87.62", period: 5, group: "IIA", block: "s", type: "Kim loại kiềm thổ", state: "Rắn", config: "[Kr] 5s²", outerE: 2, ox: "0, +2", en: 0.95, category: "alkaline", rem: ["Tạo ngọn lửa màu đỏ rực khi cháy, dùng làm pháo hoa.", "Muối strontium ứng dụng trong y học hạt nhân."] },
+            { z: 39, symbol: "Y", name: "Yttrium", mass: "88.906", period: 5, group: "IIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Kr] 4d¹ 5s²", outerE: 2, ox: "0, +3", en: 1.22, category: "transition", rem: ["Dùng sản xuất vật liệu phát quang màu đỏ trong màn hình LED/TV.", "Ứng dụng trong hợp kim siêu chịu nhiệt."] },
+            { z: 40, symbol: "Zr", name: "Zirconium", mass: "91.224", period: 5, group: "IVB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Kr] 4d² 5s²", outerE: 2, ox: "0, +4", en: 1.33, category: "transition", rem: ["Chống ăn mòn cực tốt, dùng làm vỏ thanh nhiên liệu hạt nhân.", "Đá zirconia (đá tổng hợp) có độ sáng lấp lánh giống kim cương."] },
+            { z: 41, symbol: "Nb", name: "Niobium", mass: "92.906", period: 5, group: "VB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Kr] 4d⁴ 5s¹", outerE: 1, ox: "0, +3, +5", en: 1.6, category: "transition", rem: ["Cấu hình ngoại lệ: 4d⁴ 5s¹.", "Dùng chế tạo thép hợp kim siêu bền cho đường ống dẫn dầu và siêu dẫn."] },
+            { z: 42, symbol: "Mo", name: "Molybdenum", mass: "95.95", period: 5, group: "VIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Kr] 4d⁵ 5s¹", outerE: 1, ox: "0, +2, +3, +4, +5, +6", en: 2.16, category: "transition", rem: ["Cấu hình ngoại lệ: 4d⁵ 5s¹.", "Kim loại có điểm nóng chảy rất cao, dùng tăng độ cứng cho thép."] },
+            { z: 43, symbol: "Tc", name: "Technetium", mass: "98", period: 5, group: "VIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Kr] 4d⁵ 5s²", outerE: 2, ox: "0, +4, +6, +7", en: 1.9, category: "transition", rem: ["Nguyên tố phóng xạ nhẹ nhất không có đồng vị bền nào.", "Ứng dụng rộng rãi trong y học hạt nhân chẩn đoán hình ảnh."] },
+            { z: 44, symbol: "Ru", name: "Ruthenium", mass: "101.07", period: 5, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Kr] 4d⁷ 5s¹", outerE: 1, ox: "0, +2, +3, +4, +6, +8", en: 2.2, category: "transition", rem: ["Kim loại nhóm bạch kim hiếm, cứng và chống ăn mòn.", "Dùng trong điện tử và chất xúc tác hóa học."] },
+            { z: 45, symbol: "Rh", name: "Rhodium", mass: "102.91", period: 5, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Kr] 4d⁸ 5s¹", outerE: 1, ox: "0, +1, +2, +3, +4", en: 2.28, category: "transition", rem: ["Một trong những kim loại quý hiếm và đắt giá nhất trên thế giới.", "Dùng trong bộ chuyển đổi xúc tác ô tô và mạ trang sức."] },
+            { z: 46, symbol: "Pd", name: "Palladium", mass: "106.42", period: 5, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Kr] 4d¹⁰", outerE: 0, ox: "0, +2, +4", en: 2.20, category: "transition", rem: ["Cấu hình ngoại lệ: 4d¹⁰ 5s⁰.", "Có khả năng hấp thụ lượng lớn khí hydrogen ở nhiệt độ phòng."] },
+            { z: 47, symbol: "Ag", name: "Silver", mass: "107.87", period: 5, group: "IB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Kr] 4d¹⁰ 5s¹", outerE: 1, ox: "0, +1", en: 1.93, category: "transition", rem: ["Cấu hình ngoại lệ: 4d¹⁰ 5s¹.", "Kim loại dẫn điện và dẫn nhiệt tốt nhất trong tất cả các nguyên tố."] },
+            { z: 48, symbol: "Cd", name: "Cadmium", mass: "112.41", period: 5, group: "IIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Kr] 4d¹⁰ 5s²", outerE: 2, ox: "0, +2", en: 1.69, category: "transition", rem: ["Kim loại độc hại, dùng trong pin Ni-Cd và mạ bảo vệ chống ăn mòn.", "Tính chất tương tự kẽm nhưng độc hơn."] },
+            { z: 49, symbol: "In", name: "Indium", mass: "114.82", period: 5, group: "IIIA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Kr] 4d¹⁰ 5s² 5p¹", outerE: 3, ox: "0, +1, +3", en: 1.78, category: "posttransition", rem: ["Kim loại cực mềm, có thể cắt bằng dao.", "Dùng làm màng dẫn điện trong màn hình cảm ứng (ITO)."] },
+            { z: 50, symbol: "Sn", name: "Tin", mass: "118.71", period: 5, group: "IVA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Kr] 4d¹⁰ 5s² 5p²", outerE: 4, ox: "0, +2, +4", en: 1.96, category: "posttransition", rem: ["Thiếc (Inox/Hợp kim hàn), không bị ăn mòn trong không khí.", "Dùng phủ bảo vệ đồ hộp sắt thép."] },
+            { z: 51, symbol: "Sb", name: "Antimony", mass: "121.76", period: 5, group: "VA", block: "p", type: "Á kim", state: "Rắn", config: "[Kr] 4d¹⁰ 5s² 5p³", outerE: 5, ox: "0, -3, +3, +5", en: 2.05, category: "metalloid", rem: ["Á kim có tính giòn, dùng làm tăng độ cứng cho hợp kim chì.", "Ứng dụng trong chất bán dẫn và chất làm chậm cháy."] },
+            { z: 52, symbol: "Te", name: "Tellurium", mass: "127.60", period: 5, group: "VIA", block: "p", type: "Á kim", state: "Rắn", config: "[Kr] 4d¹⁰ 5s² 5p⁴", outerE: 6, ox: "0, -2, +4, +6", en: 2.1, category: "metalloid", rem: ["Á kim màu trắng bạc, tính chất giống kim loại hơn sulfur.", "Dùng trong gia công thép và thiết bị quang điện."] },
+            { z: 53, symbol: "I", name: "Iodine", mass: "126.90", period: 5, group: "VIIA", block: "p", type: "Halogen", state: "Rắn", config: "[Kr] 4d¹⁰ 5s² 5p⁵", outerE: 7, ox: "0, -1, +1, +5, +7", en: 2.66, category: "halogen", rem: ["Chất rắn màu đen tím, có hiện tượng thăng hoa khi đun nóng.", "Thiết yếu cho tuyến giáp (phòng bệnh bướu cổ)."] },
+            { z: 54, symbol: "Xe", name: "Xenon", mass: "131.29", period: 5, group: "VIIIA", block: "p", type: "Khí hiếm", state: "Khí", config: "[Kr] 4d¹⁰ 5s² 5p⁶", outerE: 8, ox: "0, +2, +4, +6, +8", en: 2.60, category: "noble", rem: ["Khí hiếm nặng, có thể tạo ra một số hợp chất với F và O.", "Dùng trong đèn pha cường độ cao và động cơ ion tàu vũ trụ."] },
+            { z: 55, symbol: "Cs", name: "Cesium", mass: "132.91", period: 6, group: "IA", block: "s", type: "Kim loại kiềm", state: "Rắn", config: "[Xe] 6s¹", outerE: 1, ox: "0, +1", en: 0.79, category: "alkali", rem: ["Kim loại kiềm hoạt động mạnh nhất trong các nguyên tố bền.", "Dùng chuẩn hóa đồng hồ nguyên tử (giây chuẩn quốc tế)."] },
+            { z: 56, symbol: "Ba", name: "Barium", mass: "137.33", period: 6, group: "IIA", block: "s", type: "Kim loại kiềm thổ", state: "Rắn", config: "[Xe] 6s²", outerE: 2, ox: "0, +2", en: 0.89, category: "alkaline", rem: ["Muối BaSO₄ dùng làm chất cản quang trong chụp X-quang đường tiêu hóa.", "Cho ngọn lửa màu xanh lục khi cháy."] },
+            { z: 57, symbol: "La", name: "Lanthanum", mass: "138.91", period: 6, group: "IIIB", block: "d", type: "Họ Lantan", state: "Rắn", config: "[Xe] 5d¹ 6s²", outerE: 2, ox: "0, +3", en: 1.10, category: "lanthanide", rem: ["Nguyên tố mở đầu cho họ Lantan (họ đất hiếm).", "Dùng trong thấu kính quang học máy ảnh cao cấp và pin NiMH."] },
+            { z: 58, symbol: "Ce", name: "Cerium", mass: "140.12", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f¹ 5d¹ 6s²", outerE: 2, ox: "0, +3, +4", en: 1.12, category: "lanthanide", rem: ["Nguyên tố đất hiếm phổ biến nhất trong vỏ Trái Đất.", "Hợp kim chứa cerium dùng làm đá lửa bật lửa."] },
+            { z: 59, symbol: "Pr", name: "Praseodymium", mass: "140.91", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f³ 6s²", outerE: 2, ox: "0, +3, +4", en: 1.13, category: "lanthanide", rem: ["Tạo màu vàng cho thủy tinh và kính bảo hộ thợ hàn.", "Thành phần của hợp kim didymium."] },
+            { z: 60, symbol: "Nd", name: "Neodymium", mass: "144.24", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f⁴ 6s²", outerE: 2, ox: "0, +3", en: 1.14, category: "lanthanide", rem: ["Dùng chế tạo nam châm đất hiếm cực mạnh (NdFeB).", "Ứng dụng trong tai nghe, động cơ điện và tua bin gió."] },
+            { z: 61, symbol: "Pm", name: "Promethium", mass: "145", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f⁵ 6s²", outerE: 2, ox: "0, +3", en: 1.13, category: "lanthanide", rem: ["Nguyên tố phóng xạ, không có đồng vị bền trong tự nhiên.", "Dùng trong nguồn phát tia beta mỏng và pin nguyên tử nhỏ."] },
+            { z: 62, symbol: "Sm", name: "Samarium", mass: "150.36", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f⁶ 6s²", outerE: 2, ox: "0, +2, +3", en: 1.17, category: "lanthanide", rem: ["Nam châm Sm-Co chịu nhiệt độ cao rất tốt.", "Dùng trong điều trị ung thư và thiết bị ghi âm."] },
+            { z: 63, symbol: "Eu", name: "Europium", mass: "151.96", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f⁷ 6s²", outerE: 2, ox: "0, +2, +3", en: 1.2, category: "lanthanide", rem: ["Là nguyên tố đất hiếm phản ứng mạnh nhất.", "Chất phát quang màu đỏ trong màn hình TV màu và tiền giấy chống giả."] },
+            { z: 64, symbol: "Gd", name: "Gadolinium", mass: "157.25", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f⁷ 5d¹ 6s²", outerE: 2, ox: "0, +3", en: 1.20, category: "lanthanide", rem: ["Có tính chất từ tính đặc biệt ở nhiệt độ thấp.", "Dùng làm chất tương phản trong chụp cộng hưởng từ (MRI)."] },
+            { z: 65, symbol: "Tb", name: "Terbium", mass: "158.93", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f⁹ 6s²", outerE: 2, ox: "0, +3, +4", en: 1.2, category: "lanthanide", rem: ["Dùng tạo phốt pho phát quang màu xanh lục trong đèn huỳnh quang.", "Ứng dụng trong thiết bị lưu trữ quang học."] },
+            { z: 66, symbol: "Dy", name: "Dysprosium", mass: "162.50", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f¹⁰ 6s²", outerE: 2, ox: "0, +3", en: 1.22, category: "lanthanide", rem: ["Có khả năng hấp thụ neutron nhiệt cao.", "Dùng trong nam châm hiệu suất cao chịu nhiệt."] },
+            { z: 67, symbol: "Ho", name: "Holmium", mass: "164.93", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f¹¹ 6s²", outerE: 2, ox: "0, +3", en: 1.23, category: "lanthanide", rem: ["Có mô men từ lớn nhất trong các tự nhiên.", "Dùng trong laser y tế phẫu thuật mắt và hiệu chuẩn quang phổ."] },
+            { z: 68, symbol: "Er", name: "Erbium", mass: "167.26", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f¹² 6s²", outerE: 2, ox: "0, +3", en: 1.24, category: "lanthanide", rem: ["Ion Er³⁺ phát xạ ánh sáng hồng ngoại trong cáp quang truyền thông.", "Dùng khuếch đại tín hiệu internet quang học."] },
+            { z: 69, symbol: "Tm", name: "Thulium", mass: "168.93", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f¹³ 6s²", outerE: 2, ox: "0, +2, +3", en: 1.25, category: "lanthanide", rem: ["Nguyên tố đất hiếm ít phổ biến nhất trong tự nhiên.", "Đồng vị phóng xạ dùng trong thiết bị X-quang di động nhỏ gọn."] },
+            { z: 70, symbol: "Yb", name: "Ytterbium", mass: "173.05", period: 6, group: "IIIB", block: "f", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f¹⁴ 6s²", outerE: 2, ox: "0, +2, +3", en: 1.1, category: "lanthanide", rem: ["Được nghiên cứu ứng dụng trong đồng hồ nguyên tử thế hệ mới.", "Dùng chế tạo ứng suất kế trong công trình xây dựng."] },
+            { z: 71, symbol: "Lu", name: "Lutetium", mass: "174.97", period: 6, group: "IIIB", block: "d", type: "Họ Lantan", state: "Rắn", config: "[Xe] 4f¹⁴ 5d¹ 6s²", outerE: 2, ox: "0, +3", en: 1.27, category: "lanthanide", rem: ["Nguyên tố cuối cùng của họ Lantan, thuộc block d.", "Kim loại rất khó điều chế và đắt đỏ."] },
+            { z: 72, symbol: "Hf", name: "Hafnium", mass: "178.49", period: 6, group: "IVB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d² 6s²", outerE: 2, ox: "0, +4", en: 1.3, category: "transition", rem: ["Hấp thụ neutron mạnh, dùng làm thanh điều khiển lò phản ứng hạt nhân.", "Luôn đi kèm với zirconium trong khoáng vật."] },
+            { z: 73, symbol: "Ta", name: "Tantalum", mass: "180.95", period: 6, group: "VB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d³ 6s²", outerE: 2, ox: "0, +2, +3, +4, +5", en: 1.5, category: "transition", rem: ["Kim loại trơ hóa học cao, không bị ăn mòn bởi axit ở nhiệt độ thường.", "Dùng làm tụ điện điện tử thu nhỏ trong điện thoại thông minh."] },
+            { z: 74, symbol: "W", name: "Tungsten", mass: "183.84", period: 6, group: "VIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d⁴ 6s²", outerE: 2, ox: "0, +2, +3, +4, +5, +6", en: 2.36, category: "transition", rem: ["Có điểm nóng chảy cao nhất trong tất cả các kim loại (3422°C).", "Dùng làm dây tóc bóng đèn sợi đốt và hợp kim siêu cứng."] },
+            { z: 75, symbol: "Re", name: "Rhenium", mass: "186.21", period: 6, group: "VIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d⁵ 6s²", outerE: 2, ox: "0, -1, +1, +2, +3, +4, +5, +6, +7", en: 1.9, category: "transition", rem: ["Một trong những nguyên tố hiếm nhất trong vỏ Trái Đất.", "Điểm nóng chảy rất cao, dùng trong động cơ phản lực hàng không."] },
+            { z: 76, symbol: "Os", name: "Osmium", mass: "190.23", period: 6, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d⁶ 6s²", outerE: 2, ox: "0, +2, +3, +4, +6, +8", en: 2.2, category: "transition", rem: ["Là nguyên tố tự nhiên có mật độ (khối lượng riêng) lớn nhất (22.59 g/cm³).", "Kim loại rất cứng và giòn."] },
+            { z: 77, symbol: "Ir", name: "Iridium", mass: "192.22", period: 6, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d⁷ 6s²", outerE: 2, ox: "0, +1, +2, +3, +4, +6", en: 2.20, category: "transition", rem: ["Kim loại chống ăn mòn tốt nhất thế giới.", "Lớp đất chứa nhiều iridium đánh dấu sự tuyệt chủng của khủng long."] },
+            { z: 78, symbol: "Pt", name: "Platinum", mass: "195.08", period: 6, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d⁹ 6s¹", outerE: 1, ox: "0, +2, +4", en: 2.28, category: "transition", rem: ["Cấu hình ngoại lệ: 5d⁹ 6s¹.", "Kim loại quý (bạch kim), dùng làm trang sức cao cấp và chất xúc tác."] },
+            { z: 79, symbol: "Au", name: "Gold", mass: "196.97", period: 6, group: "IB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", outerE: 1, ox: "0, +1, +3", en: 2.54, category: "transition", rem: ["Cấu hình ngoại lệ: 5d¹⁰ 6s¹.", "Kim loại quý, không bị oxi hóa trong không khí, tính dẻo cao."] },
+            { z: 80, symbol: "Hg", name: "Mercury", mass: "200.59", period: 6, group: "IIB", block: "d", type: "Kim loại chuyển tiếp", state: "Lỏng", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s²", outerE: 2, ox: "0, +1, +2", en: 2.00, category: "transition", rem: ["Kim loại duy nhất ở thể lỏng ở điều kiện thường.", "Độc tính cao, dùng trong nhiệt kế và áp suất kế cũ."] },
+            { z: 81, symbol: "Tl", name: "Thallium", mass: "204.38", period: 6, group: "IIIA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹", outerE: 3, ox: "0, +1, +3", en: 1.62, category: "posttransition", rem: ["Kim loại mềm, độc tính cao từng dùng làm thuốc diệt chuột.", "Hợp chất dùng trong thiết bị quang học hồng ngoại."] },
+            { z: 82, symbol: "Pb", name: "Lead", mass: "207.2", period: 6, group: "IVA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²", outerE: 4, ox: "0, +2, +4", en: 1.87, category: "posttransition", rem: ["Kim loại nặng, mềm, chắn tia X và tia phóng xạ hiệu quả.", "Dùng trong bình ắc quy và tấm lợp."] },
+            { z: 83, symbol: "Bi", name: "Bismuth", mass: "208.98", period: 6, group: "VA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³", outerE: 5, ox: "0, +3, +5", en: 2.02, category: "posttransition", rem: ["Kim loại có độ độc sinh học thấp nhất trong các kim loại nặng.", "Tinh thể có màu sắc óng ánh cầu vồng đẹp mắt."] },
+            { z: 84, symbol: "Po", name: "Polonium", mass: "209", period: 6, group: "VIA", block: "p", type: "Á kim", state: "Rắn", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴", outerE: 6, ox: "0, -2, +2, +4, +6", en: 2.0, category: "metalloid", rem: ["Nguyên tố phóng xạ cực kỳ mạnh và độc hại do Marie Curie phát hiện.", "Dùng làm nguồn phát nhiệt phóng xạ trong vệ tinh."] },
+            { z: 85, symbol: "At", name: "Astatine", mass: "210", period: 6, group: "VIIA", block: "p", type: "Halogen", state: "Rắn", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵", outerE: 7, ox: "0, -1, +1, +3, +5", en: 2.2, category: "halogen", rem: ["Nguyên tố halogen phóng xạ và hiếm nhất trong vỏ Trái Đất.", "Thời gian bán hủy rất ngắn (khoảng vài giờ)."] },
+            { z: 86, symbol: "Rn", name: "Radon", mass: "222", period: 6, group: "VIIIA", block: "p", type: "Khí hiếm", state: "Khí", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶", outerE: 8, ox: "0", en: 2.2, category: "noble", rem: ["Khí hiếm phóng xạ, sinh ra từ sự phân rã của radium trong đất đá.", "Nồng độ cao trong nhà có thể gây nguy cơ ung thư phổi."] },
+            { z: 87, symbol: "Fr", name: "Francium", mass: "223", period: 7, group: "IA", block: "s", type: "Kim loại kiềm", state: "Rắn", config: "[Rn] 7s¹", outerE: 1, ox: "0, +1", en: 0.7, category: "alkali", rem: ["Kim loại kiềm phóng xạ, cực kỳ hiếm và hoạt động mạnh nhất.", "Thời gian bán hủy chỉ khoảng 22 phút."] },
+            { z: 88, symbol: "Ra", name: "Radium", mass: "226", period: 7, group: "IIA", block: "s", type: "Kim loại kiềm thổ", state: "Rắn", config: "[Rn] 7s²", outerE: 2, ox: "0, +2", en: 0.9, category: "alkaline", rem: ["Nguyên tố phóng xạ phát ra ánh sáng xanh mờ trong tối.", "Được Marie Curie phát hiện, từng dùng trong sơn dạ quang."] },
+            { z: 89, symbol: "Ac", name: "Actinium", mass: "227", period: 7, group: "IIIB", block: "d", type: "Họ Actini", state: "Rắn", config: "[Rn] 6d¹ 7s²", outerE: 2, ox: "0, +3", en: 1.1, category: "actinide", rem: ["Nguyên tố mở đầu cho họ Actini (họ phóng xạ).", "Phát ra bức xạ màu xanh lam trong bóng tối do phóng xạ mạnh."] },
+            { z: 90, symbol: "Th", name: "Thorium", mass: "232.04", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 6d² 7s²", outerE: 2, ox: "0, +4", en: 1.3, category: "actinide", rem: ["Nguồn năng lượng hạt nhân tiềm năng thay thế uranium trong tương lai.", "Dùng trong măng xông đèn và hợp kim chịu nhiệt."] },
+            { z: 91, symbol: "Pa", name: "Protactinium", mass: "231.04", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f² 6d¹ 7s²", outerE: 2, ox: "0, +3, +4, +5", en: 1.5, category: "actinide", rem: ["Nguyên tố phóng xạ hiếm, độc tính cao.", "Không có ứng dụng thương mại rộng rãi ngoài nghiên cứu."] },
+            { z: 92, symbol: "U", name: "Uranium", mass: "238.03", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f³ 6d¹ 7s²", outerE: 2, ox: "0, +3, +4, +5, +6", en: 1.38, category: "actinide", rem: ["Nhiên liệu chính cho các nhà máy điện hạt nhân và vũ khí hạt nhân.", "Kim loại nặng phóng xạ tự nhiên."] },
+            { z: 93, symbol: "Np", name: "Neptunium", mass: "237", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f⁴ 6d¹ 7s²", outerE: 2, ox: "0, +3, +4, +5, +6, +7", en: 1.36, category: "actinide", rem: ["Nguyên tố siêu uranium đầu tiên được tổng hợp nhân tạo.", "Sản phẩm phụ trong lò phản ứng hạt nhân."] },
+            { z: 94, symbol: "Pu", name: "Plutonium", mass: "244", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f⁶ 7s²", outerE: 2, ox: "0, +3, +4, +5, +6, +7", en: 1.28, category: "actinide", rem: ["Dùng làm nhiên liệu hạt nhân cho lò phản ứng nhanh và tàu vũ trụ thăm dò.", "Vật liệu chế tạo vũ khí hạt nhân."] },
+            { z: 95, symbol: "Am", name: "Americium", mass: "243", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f⁷ 7s²", outerE: 2, ox: "0, +3, +4, +5, +6", en: 1.3, category: "actinide", rem: ["Được sử dụng phổ biến trong các thiết bị báo khói gia đình (detector khói).", "Phát ra tia alpha và gamma."] },
+            { z: 96, symbol: "Cm", name: "Curium", mass: "247", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f⁷ 6d¹ 7s²", outerE: 2, ox: "0, +3, +4", en: 1.3, category: "actinide", rem: ["Đặt tên để vinh danh vợ chồng nhà bác học Marie và Pierre Curie.", "Phát ra nhiệt lượng lớn do phóng xạ."] },
+            { z: 97, symbol: "Bk", name: "Berkelium", mass: "247", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f⁹ 7s²", outerE: 2, ox: "0, +3, +4", en: 1.3, category: "actinide", rem: ["Tổng hợp nhân tạo lần đầu tại Đại học Berkeley (California).", "Chủ yếu dùng trong nghiên cứu khoa học hạt nhân cơ bản."] },
+            { z: 98, symbol: "Cf", name: "Californium", mass: "251", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f¹⁰ 7s²", outerE: 2, ox: "0, +2, +3, +4", en: 1.3, category: "actinide", rem: ["Nguồn phát neutron mạnh mẽ dùng để khởi động lò phản ứng hạt nhân.", "Dùng phát hiện vật liệu bằng quang phổ neutron."] },
+            { z: 99, symbol: "Es", name: "Einsteinium", mass: "252", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f¹¹ 7s²", outerE: 2, ox: "0, +2, +3", en: 1.3, category: "actinide", rem: ["Được phát hiện trong bụi vụ nổ bom hydro đầu tiên (1952).", "Đặt tên vinh danh nhà vật lý Albert Einstein."] },
+            { z: 100, symbol: "Fm", name: "Fermium", mass: "257", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f¹² 7s²", outerE: 2, ox: "0, +2, +3", en: 1.3, category: "actinide", rem: ["Đặt tên theo nhà vật lý Enrico Fermi.", "Nguyên tố nặng tổng hợp nhân tạo trong phòng thí nghiệm."] },
+            { z: 101, symbol: "Md", name: "Mendelevium", mass: "258", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f¹³ 7s²", outerE: 2, ox: "0, +2, +3", en: 1.3, category: "actinide", rem: ["Vinh danh Dmitri Mendeleev - người sáng lập bảng tuần hoàng hóa học.", "Tổng hợp bằng cách bắn phá einsteinium bằng hạt alpha."] },
+            { z: 102, symbol: "No", name: "Nobelium", mass: "259", period: 7, group: "IIIB", block: "f", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f¹⁴ 7s²", outerE: 2, ox: "0, +2, +3", en: 1.3, category: "actinide", rem: ["Đặt tên vinh danh Alfred Nobel - nhà phát minh thuốc nổ và giải thưởng Nobel.", "Nguyên tố phóng xạ nhân tạo."] },
+            { z: 103, symbol: "Lr", name: "Lawrencium", mass: "266", period: 7, group: "IIIB", block: "d", type: "Họ Actini", state: "Rắn", config: "[Rn] 5f¹⁴ 7s² 7p¹", outerE: 3, ox: "0, +3", en: 1.3, category: "actinide", rem: ["Nguyên tố cuối cùng của họ Actini.", "Đặt tên theo Ernest Lawrence - nhà phát minh máy gia tốc cyclotron."] },
+            { z: 104, symbol: "Rf", name: "Rutherfordium", mass: "267", period: 7, group: "IVB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d² 7s²", outerE: 2, ox: "0, +4", en: null, category: "transition", rem: ["Nguyên tố chuyển tiếp siêu nặng nhân tạo.", "Đặt tên vinh danh nhà vật lý hạt nhân Ernest Rutherford."] },
+            { z: 105, symbol: "Db", name: "Dubnium", mass: "268", period: 7, group: "VB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d³ 7s²", outerE: 2, ox: "0, +5", en: null, category: "transition", rem: ["Đặt tên theo thành phố Dubna (Nga) nơi đặt trung tâm nghiên cứu hạt nhân lớn.", "Thời gian bán hủy ngắn."] },
+            { z: 106, symbol: "Sg", name: "Seaborgium", mass: "269", period: 7, group: "VIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d⁴ 7s²", outerE: 2, ox: "0, +6", en: null, category: "transition", rem: ["Vinh danh Glenn T. Seaborg - nhà hóa học phát hiện các nguyên tố siêu uranium.", "Chỉ tồn tại trong phòng thí nghiệm."] },
+            { z: 107, symbol: "Bh", name: "Bohrium", mass: "270", period: 7, group: "VIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d⁵ 7s²", outerE: 2, ox: "0, +7", en: null, category: "transition", rem: ["Đặt tên theo nhà vật lý học lượng tử vĩ đại Niels Bohr.", "Nguyên tố phóng xạ tổng hợp nhân tạo."] },
+            { z: 108, symbol: "Hs", name: "Hassium", mass: "277", period: 7, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d⁶ 7s²", outerE: 2, ox: "0, +8", en: null, category: "transition", rem: ["Đặt tên theo bang Hessen (Hassia) của Đức.", "Tổng hợp tại viện nghiên cứu GSI ở Darmstadt."] },
+            { z: 109, symbol: "Mt", name: "Meitnerium", mass: "278", period: 7, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d⁷ 7s²", outerE: 2, ox: "0", en: null, category: "transition", rem: ["Vinh danh Lise Meitner - nhà vật lý phát hiện ra hiện tượng phân hạch hạt nhân.", "Tổng hợp nhân tạo siêu nặng."] },
+            { z: 110, symbol: "Ds", name: "Darmstadtium", mass: "281", period: 7, group: "VIIIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d⁸ 7s²", outerE: 2, ox: "0", en: null, category: "transition", rem: ["Đặt tên theo thành phố Darmstadt của Đức.", "Chỉ tồn tại vỏn vẹn trong phần nghìn giây."] },
+            { z: 111, symbol: "Rg", name: "Roentgenium", mass: "282", period: 7, group: "IB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d⁹ 7s²", outerE: 2, ox: "0", en: null, category: "transition", rem: ["Vinh danh Wilhelm Röntgen - người phát hiện ra tia X.", "Nguyên tố phóng xạ cực kỳ không bền."] },
+            { z: 112, symbol: "Cn", name: "Copernicium", mass: "285", period: 7, group: "IIB", block: "d", type: "Kim loại chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s²", outerE: 2, ox: "0, +2", en: null, category: "transition", rem: ["Đặt tên theo nhà thiên học vĩ đại Nicolaus Copernicus.", "Có thể có tính chất dễ bay hơi giống khí hoặc kim loại lỏng."] },
+            { z: 113, symbol: "Nh", name: "Nihonium", mass: "286", period: 7, group: "IIIA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹", outerE: 3, ox: "0, +1", en: null, category: "posttransition", rem: ["Tên gọi xuất phát từ Nihon (Nhật Bản), do nhóm Riken tổng hợp thành công.", "Nguyên tố nhóm IIIA chu kì 7."] },
+            { z: 114, symbol: "Fl", name: "Flerovium", mass: "289", period: 7, group: "IVA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²", outerE: 4, ox: "0, +2, +4", en: null, category: "posttransition", rem: ["Vinh danh phòng thí nghiệm phản ứng hạt nhân Flerov ở Nga.", "Được nghiên cứu về tính chất hóa học tương tự khí hiếm hoặc kim loại."] },
+            { z: 115, symbol: "Mc", name: "Moscovium", mass: "290", period: 7, group: "VA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³", outerE: 5, ox: "0, +1, +3", en: null, category: "posttransition", rem: ["Đặt tên theo tỉnh Moscow (Nga).", "Nguyên tố phóng xạ nhân tạo siêu nặng thuộc nhóm VA."] },
+            { z: 116, symbol: "Lv", name: "Livermorium", mass: "293", period: 7, group: "VIA", block: "p", type: "Kim loại sau chuyển tiếp", state: "Rắn", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴", outerE: 6, ox: "0, +2, +4", en: null, category: "posttransition", rem: ["Vinh danh Phòng thí nghiệm Quốc gia Lawrence Livermore (Mỹ).", "Tổng hợp bằng phản ứng bắn phá curium bằng ion calcium."] },
+            { z: 117, symbol: "Ts", name: "Tennessine", mass: "294", period: 7, group: "VIIA", block: "p", type: "Halogen", state: "Rắn", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵", outerE: 7, ox: "0, -1, +1", en: null, category: "halogen", rem: ["Đặt tên theo bang Tennessee (Mỹ).", "Thuộc nhóm halogen (nhóm VIIA) nhưng mang tính chất kim loại hơn."] },
+            { z: 118, symbol: "Og", name: "Oganesson", mass: "294", period: 7, group: "VIIIA", block: "p", type: "Khí hiếm", state: "Rắn", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", outerE: 8, ox: "0, +2, +4", en: null, category: "noble", rem: ["Vinh danh nhà vật lý hạt nhân Yuri Oganessian.", "Nguyên tố nặng nhất trong bảng tuần hoàn hiện tại (Z = 118)."] }
+        ];
+
+        // Map category to Tailwind background/border classes
+        function getElementColorClass(category) {
+            switch(category) {
+                case 'alkali': return 'bg-red-950/70 border-red-700/80 text-red-200 hover:bg-red-900/80';
+                case 'alkaline': return 'bg-orange-950/70 border-orange-700/80 text-orange-200 hover:bg-orange-900/80';
+                case 'transition': return 'bg-yellow-950/70 border-yellow-700/80 text-yellow-200 hover:bg-yellow-900/80';
+                case 'posttransition': return 'bg-emerald-950/70 border-emerald-700/80 text-emerald-200 hover:bg-emerald-900/80';
+                case 'metalloid': return 'bg-teal-950/70 border-teal-700/80 text-teal-200 hover:bg-teal-900/80';
+                case 'nonmetal': return 'bg-sky-950/70 border-sky-700/80 text-sky-200 hover:bg-sky-900/80';
+                case 'halogen': return 'bg-indigo-950/70 border-indigo-700/80 text-indigo-200 hover:bg-indigo-900/80';
+                case 'noble': return 'bg-purple-950/70 border-purple-700/80 text-purple-200 hover:bg-purple-900/80';
+                case 'lanthanide': return 'bg-pink-950/70 border-pink-700/80 text-pink-200 hover:bg-pink-900/80';
+                case 'actinide': return 'bg-rose-950/70 border-rose-700/80 text-rose-200 hover:bg-rose-900/80';
+                default: return 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700';
+            }
+        }
+
+        // Map exact coordinates (row, col) for 1-18 periodic table layout (including Lanthanides & Actinides)
+        function getElementGridPosition(el) {
+            const z = el.z;
+            // Period 1
+            if (z === 1) return { row: 1, col: 1 };
+            if (z === 2) return { row: 1, col: 18 };
+            // Period 2
+            if (z === 3) return { row: 2, col: 1 };
+            if (z === 4) return { row: 2, col: 2 };
+            if (z >= 5 && z <= 10) return { row: 2, col: z + 8 }; // B (5) at col 13 ... Ne (10) at col 18
+            // Period 3
+            if (z === 11) return { row: 3, col: 1 };
+            if (z === 12) return { row: 3, col: 2 };
+            if (z >= 13 && z <= 18) return { row: 3, col: z - 2 }; // Al (13) at col 13 ... Ar (18) at col 18
+            // Period 4
+            if (z === 19) return { row: 4, col: 1 };
+            if (z === 20) return { row: 4, col: 2 };
+            if (z >= 21 && z <= 36) return { row: 4, col: z - 18 }; // Sc (21) at col 3 ... Kr (36) at col 18
+            // Period 5
+            if (z === 37) return { row: 5, col: 1 };
+            if (z === 38) return { row: 5, col: 2 };
+            if (z >= 39 && z <= 54) return { row: 5, col: z - 36 }; // Y (39) at col 3 ... Xe (54) at col 18
+            // Period 6
+            if (z === 55) return { row: 6, col: 1 };
+            if (z === 56) return { row: 6, col: 2 };
+            if (z === 57) return { row: 6, col: 3 }; // La
+            if (z >= 72 && z <= 86) return { row: 6, col: z - 69 }; // Hf (72) at col 3 (wait, col 4 is Hf: 72 - 68 = 4) -> let's check: 72-68 = 4. Correct!
+            // Period 7
+            if (z === 87) return { row: 7, col: 1 };
+            if (z === 88) return { row: 7, col: 2 };
+            if (z === 89) return { row: 7, col: 3 }; // Ac
+            if (z >= 104 && z <= 118) return { row: 7, col: z - 100 }; // Rf (104) -> 104 - 100 = 4. Correct!
+
+            // Lanthanides (58-71) displayed in row 9
+            if (z >= 58 && z <= 71) return { row: 9, col: z - 54 }; // Ce (58) -> col 4 ... Lu (71) -> col 17
+            // Actinides (90-103) displayed in row 10
+            if (z >= 90 && z <= 103) return { row: 10, col: z - 86 }; // Th (90) -> col 4 ... Lr (103) -> col 17
+
+            return { row: 1, col: 1 };
+        }
+
+        let isElectronegativityMode = false;
+        let activeGroupFilter = null;
+
+        // Render Periodic Table Grid
+        function renderPeriodicTable(filter = '', groupFilter = null) {
+            const container = document.getElementById('periodicTableContainer');
+            container.innerHTML = '';
+
+            // Add period labels (1 to 7) on the left
+            for (let p = 1; p <= 7; p++) {
+                const label = document.createElement('div');
+                label.className = 'flex items-center justify-center font-bold text-slate-500 text-sm';
+                label.style.gridRow = p;
+                label.style.gridColumn = 0;
+                label.textContent = p;
+                // container.appendChild(label); // optional period marker column if needed
+            }
+
+            elementsData.forEach(el => {
+                // Search filter match
+                const matchSearch = filter === '' || 
+                    el.name.toLowerCase().includes(filter.toLowerCase()) || 
+                    el.symbol.toLowerCase().includes(filter.toLowerCase()) || 
+                    el.z.toString() === filter;
+
+                // Group filter match
+                let matchGroup = true;
+                if (groupFilter === 'A') {
+                    matchGroup = el.group.includes('A');
+                } else if (groupFilter === 'B') {
+                    matchGroup = el.group.includes('B');
+                }
+
+                const pos = getElementGridPosition(el);
+                const card = document.createElement('div');
+                
+                let baseClasses = `rounded-xl border p-1.5 flex flex-col justify-between cursor-pointer transition-all duration-200 select-none shadow-sm relative group ${getElementColorClass(el.category)}`;
+                
+                if (!matchSearch || !matchGroup) {
+                    baseClasses += ' opacity-25 scale-95';
+                } else {
+                    baseClasses += ' hover:scale-105 hover:z-20 hover:shadow-cyan-500/20 hover:shadow-lg';
+                }
+
+                card.className = baseClasses;
+                card.style.gridRow = pos.row;
+                card.style.gridColumn = pos.col;
+
+                // Card inner HTML content
+                let centerDisplay = `<span class="element-symbol font-extrabold tracking-tight leading-none">${el.symbol}</span>`;
+                if (isElectronegativityMode) {
+                    centerDisplay = `<span class="text-xs font-bold text-purple-300 bg-purple-950/80 px-1 rounded">⚡ ${el.en !== null ? el.en : 'N/A'}</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start w-full">
+                        <span class="text-[10px] font-bold opacity-80">${el.z}</span>
+                        <span class="text-[9px] opacity-70 font-mono">${el.group}</span>
+                    </div>
+                    <div class="text-center my-auto py-0.5">
+                        ${centerDisplay}
+                    </div>
+                    <div class="text-[9px] truncate text-center opacity-90 font-medium">${el.name}</div>
+                `;
+
+                card.onclick = () => openDetailModal(el.z);
+                container.appendChild(card);
+            });
+
+            // Add Lanthanide & Actinide row labels
+            const lanthanideLabel = document.createElement('div');
+            lanthanideLabel.className = 'col-span-3 flex items-center justify-end pr-2 text-xs font-bold text-pink-400';
+            lanthanideLabel.style.gridRow = 9;
+            lanthanideLabel.style.gridColumn = '1 / span 3';
+            lanthanideLabel.innerHTML = 'Họ Lantan (57-71):';
+            container.appendChild(lanthanideLabel);
+
+            const actinideLabel = document.createElement('div');
+            actinideLabel.className = 'col-span-3 flex items-center justify-end pr-2 text-xs font-bold text-rose-400';
+            actinideLabel.style.gridRow = 10;
+            actinideLabel.style.gridColumn = '1 / span 3';
+            actinideLabel.innerHTML = 'Họ Actini (89-103):';
+            container.appendChild(actinideLabel);
+        }
+
+        // Search input event listener
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            renderPeriodicTable(e.target.value.trim(), activeGroupFilter);
+        });
+
+        // Filter Group A / B
+        function filterGroupType(type) {
+            if (activeGroupFilter === type) {
+                activeGroupFilter = null;
+                document.getElementById('btnGroupA').classList.remove('ring-2', 'ring-white');
+                document.getElementById('btnGroupB').classList.remove('ring-2', 'ring-white');
+            } else {
+                activeGroupFilter = type;
+                if (type === 'A') {
+                    document.getElementById('btnGroupA').classList.add('ring-2', 'ring-white');
+                    document.getElementById('btnGroupB').classList.remove('ring-2', 'ring-white');
+                } else {
+                    document.getElementById('btnGroupB').classList.add('ring-2', 'ring-white');
+                    document.getElementById('btnGroupA').classList.remove('ring-2', 'ring-white');
+                }
+            }
+            renderPeriodicTable(document.getElementById('searchInput').value.trim(), activeGroupFilter);
+        }
+
+        // Toggle Electronegativity mode
+        function toggleElectronegativityMode() {
+            isElectronegativityMode = !isElectronegativityMode;
+            const btn = document.getElementById('btnElectronegativity');
+            const status = document.getElementById('modeStatus');
+            if (isElectronegativityMode) {
+                btn.classList.add('ring-2', 'ring-white', 'bg-purple-700');
+                status.classList.remove('hidden');
+            } else {
+                btn.classList.remove('ring-2', 'ring-white', 'bg-purple-700');
+                status.classList.add('hidden');
+            }
+            renderPeriodicTable(document.getElementById('searchInput').value.trim(), activeGroupFilter);
+        }
+
+        // Reset filters
+        function resetFilters() {
+            activeGroupFilter = null;
+            isElectronegativityMode = false;
+            document.getElementById('searchInput').value = '';
+            document.getElementById('btnGroupA').classList.remove('ring-2', 'ring-white');
+            document.getElementById('btnGroupB').classList.remove('ring-2', 'ring-white');
+            document.getElementById('btnElectronegativity').classList.remove('ring-2', 'ring-white', 'bg-purple-700');
+            document.getElementById('modeStatus').classList.add('hidden');
+            renderPeriodicTable('', null);
+        }
+
+        // Detail Modal Logic
+        function openDetailModal(z) {
+            const el = elementsData.find(item => item.z === z);
+            if (!el) return;
+
+            document.getElementById('modalZBadge').textContent = el.z;
+            document.getElementById('modalElementName').textContent = el.name;
+            document.getElementById('modalElementSub').innerHTML = `Kí hiệu: <span class="text-cyan-400 font-bold">${el.symbol}</span> • Nguyên tử khối: <span class="text-white font-semibold">${el.mass}</span>`;
+            document.getElementById('modalPeriod').textContent = `Chu kì ${el.period}`;
+            document.getElementById('modalGroup').textContent = `Nhóm ${el.group}`;
+            document.getElementById('modalBlock').textContent = `Block ${el.block}`;
+            document.getElementById('modalElectronegativity').textContent = el.en !== null ? el.en : 'Không xác định';
+            document.getElementById('modalConfig').textContent = el.config;
+
+            // Reasoning flow diagram values
+            document.getElementById('stepZ').textContent = `Z = ${el.z}`;
+            document.getElementById('stepLayers').textContent = `${el.period} lớp e`;
+            document.getElementById('stepPeriod').textContent = `Chu kì ${el.period}`;
+            document.getElementById('stepBlock').textContent = `Block ${el.block}`;
+            document.getElementById('stepGroup').textContent = `Nhóm ${el.group}`;
+
+            // Detailed reasoning text according to Grade 10 Chemistry
+            let reasoning = `Nguyên tố ${el.name} có số hiệu nguyên tử Z = ${el.z}. Cấu hình electron ${el.config} cho thấy nguyên tử có ${el.period} lớp electron (xác định Chu kì ${el.period}). Phân lớp electron cuối cùng điền vào là phân lớp ${el.block} (xác định Block ${el.block}).`;
+            if (el.group.includes('A')) {
+                reasoning += ` Do thuộc nguyên tố s hoặc p, hóa trị và số electron lớp ngoài cùng (${el.outerE} e) tương ứng với nhóm ${el.group} (Nhóm A).`;
+            } else {
+                reasoning += ` Do thuộc nguyên tố chuyển tiếp (block d hoặc f), vị trí thuộc Nhóm ${el.group} (Nhóm B) được xác định chuẩn theo quy tắc cấu hình electron hóa trị của nguyên tố chuyển tiếp Hóa học 10.`;
+            }
+            document.getElementById('modalReasoningText').textContent = reasoning;
+
+            document.getElementById('modalOuterE').textContent = `${el.outerE} electron`;
+            document.getElementById('modalType').textContent = el.type;
+            document.getElementById('modalState').textContent = el.state;
+            document.getElementById('modalOxidation').textContent = el.ox;
+
+            const remList = document.getElementById('modalRememberList');
+            remList.innerHTML = '';
+            el.rem.forEach(r => {
+                const li = document.createElement('li');
+                li.textContent = r;
+                remList.appendChild(li);
+            });
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // Compare Modal Logic
+        function openCompareModal() {
+            populateCompareSelects();
+            updateComparison();
+            document.getElementById('compareModal').classList.remove('hidden');
+        }
+
+        function closeCompareModal() {
+            document.getElementById('compareModal').classList.add('hidden');
+        }
+
+        function populateCompareSelects() {
+            const sel1 = document.getElementById('compareSelect1');
+            const sel2 = document.getElementById('compareSelect2');
+            if (sel1.options.length > 0) return; // already populated
+
+            elementsData.forEach((el, index) => {
+                const opt1 = document.createElement('option');
+                opt1.value = el.z;
+                opt1.textContent = `${el.z}. ${el.name} (${el.symbol})`;
+                sel1.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = el.z;
+                opt2.textContent = `${el.z}. ${el.name} (${el.symbol})`;
+                if (index === 15) opt2.selected = true; // default select Sulfur or Cl
+                sel2.appendChild(opt2);
+            });
+            sel1.selectedIndex = 10; // Na
+            sel2.selectedIndex = 16; // Cl
+        }
+
+        function updateComparison() {
+            const z1 = parseInt(document.getElementById('compareSelect1').value);
+            const z2 = parseInt(document.getElementById('compareSelect2').value);
+            const el1 = elementsData.find(e => e.z === z1);
+            const el2 = elementsData.find(e => e.z === z2);
+
+            document.getElementById('compHeader1').textContent = `${el1.name} (${el1.symbol})`;
+            document.getElementById('compHeader2').textContent = `${el2.name} (${el2.symbol})`;
+
+            const criteria = [
+                { label: "Số hiệu Z", val1: el1.z, val2: el2.z },
+                { label: "Nguyên tử khối", val1: el1.mass, val2: el2.mass },
+                { label: "Chu kì", val1: `Chu kì ${el1.period}`, val2: `Chu kì ${el2.period}` },
+                { label: "Nhóm (A/B)", val1: `Nhóm ${el1.group}`, val2: `Nhóm ${el2.group}` },
+                { label: "Cấu hình electron", val1: el1.config, val2: el2.config },
+                { label: "Block", val1: `Block ${el1.block}`, val2: `Block ${el2.block}` },
+                { label: "Electron lớp ngoài cùng", val1: `${el1.outerE} e`, val2: `${el2.outerE} e` },
+                { label: "Phân loại tính chất", val1: el1.type, val2: el2.type },
+                { label: "Trạng thái (ĐK thường)", val1: el1.state, val2: el2.state },
+                { label: "Độ âm điện Pauling", val1: el1.en !== null ? el1.en : 'Không có', val2: el2.en !== null ? el2.en : 'Không có' },
+                { label: "Số oxi hóa phổ biến", val1: el1.ox, val2: el2.ox }
+            ];
+
+            const tbody = document.getElementById('compareTableBody');
+            tbody.innerHTML = '';
+            criteria.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-slate-300 border-b border-slate-700/60">${c.label}</td>
+                    <td class="p-3 text-cyan-300 font-semibold border-b border-slate-700/60">${c.val1}</td>
+                    <td class="p-3 text-amber-300 font-semibold border-b border-slate-700/60">${c.val2}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Observation generation
+            let obs = `So sánh giữa <strong>${el1.name}</strong> (Z=${el1.z}) và <strong>${el2.name}</strong> (Z=${el2.z}): `;
+            if (el1.period === el2.period) {
+                obs += `Cả hai nguyên tố đều nằm trong <strong>Chu kì ${el1.period}</strong>. `;
+            } else {
+                obs += `Nằm ở hai chu kì khác nhau (${el1.period} và ${el2.period}). `;
+            }
+            if (el1.en !== null && el2.en !== null) {
+                if (el1.en > el2.en) {
+                    obs += `Độ âm điện của ${el1.name} (${el1.en}) lớn hơn ${el2.name} (${el2.en}), thể hiện tính phi kim mạnh hơn.`;
+                } else if (el1.en < el2.en) {
+                    obs += `Độ âm điện của ${el2.name} (${el2.en}) lớn hơn ${el1.name} (${el1.en}), thể hiện tính phi kim mạnh hơn.`;
+                } else {
+                    obs += `Cả hai có độ âm điện tương đương nhau (${el1.en}).`;
+                }
+            } else {
+                obs += `Một trong hai nguyên tố là khí hiếm hoặc chưa xác định rõ độ âm điện Pauling.`;
+            }
+            document.getElementById('compareObservation').innerHTML = obs;
+        }
+
+        // Quiz / Self-study Tasks Logic
+        const quizList = [
+            {
+                question: "Nguyên tố nào có số hiệu nguyên tử Z = 11?",
+                options: ["Sodium (Na)", "Potassium (K)", "Magnesium (Mg)", "Calcium (Ca)"],
+                correct: 0,
+                explanation: "Sodium (Na) có số hiệu nguyên tử Z = 11, thuộc nhóm IA, chu kì 3, là kim loại kiềm điển hình."
+            },
+            {
+                question: "Cấu hình electron nguyên tử của nguyên tố X là 1s² 2s² 2p⁶ 3s¹. Xác định vị trí của X trong bảng tuần hoàn:",
+                options: ["Chu kì 3, Nhóm IA", "Chu kì 2, Nhóm IA", "Chu kì 3, Nhóm IIA", "Chu kì 3, Nhóm VIIA"],
+                correct: 0,
+                explanation: "Có 3 lớp electron nên thuộc Chu kì 3. Số electron lớp ngoài cùng là 1 (ở phân lớp 3s¹) nên thuộc Nhóm IA."
+            },
+            {
+                question: "Nguyên tố nào có độ âm điện lớn nhất theo thang Pauling (3.98)?",
+                options: ["Oxygen (O)", "Fluorine (F)", "Chlorine (Cl)", "Nitrogen (N)"],
+                correct: 1,
+                explanation: "Fluorine (F) có độ âm điện lớn nhất trong tất cả các nguyên tố (3.98), là phi kim hoạt động mạnh nhất."
+            },
+            {
+                question: "Trong một chu kì, khi đi từ trái sang phải, độ âm điện của các nguyên tố nhìn chung có xu hướng thế nào?",
+                options: ["Tăng dần", "Giảm dần", "Không đổi", "Biến đổi không theo quy luật"],
+                correct: 0,
+                explanation: "Trong một chu kì, từ trái sang phải, điện tích hạt nhân tăng dần trong khi số lớp electron không đổi, làm tăng lực hút hạt nhân với electron, dẫn đến độ âm điện nhìn chung tăng."
+            },
+            {
+                question: "Nguyên tố nào sau đây thuộc nhóm halogen (Nhóm VIIA)?",
+                options: ["Chlorine (Cl)", "Sodium (Na)", "Sulfur (S)", "Argon (Ar)"],
+                correct: 0,
+                explanation: "Chlorine (Cl) có 7 electron lớp ngoài cùng, thuộc nhóm VIIA và là một halogen quan trọng."
+            },
+            {
+                question: "Kim loại nào ở thể lỏng ở điều kiện thường?",
+                options: ["Mercury (Hg)", "Sodium (Na)", "Iron (Fe)", "Copper (Cu)"],
+                correct: 0,
+                explanation: "Mercury (Thủy ngân - Hg) là kim loại duy nhất tồn tại ở trạng thái lỏng ở điều kiện thường."
+            },
+            {
+                question: "Xác định số electron lớp ngoài cùng của nguyên tố Aluminum (Al, Z = 13):",
+                options: ["3 electron", "1 electron", "2 electron", "5 electron"],
+                correct: 0,
+                explanation: "Cấu hình electron của Al (Z = 13) là [Ne] 3s² 3p¹, tổng số electron ở lớp ngoài cùng (lớp 3) là 2 + 1 = 3 electron."
+            },
+            {
+                question: "Trong một nhóm A, khi đi từ trên xuống dưới trong bảng tuần hoàn, bán kính nguyên tử có xu hướng thế nào?",
+                options: ["Tăng dần", "Giảm dần", "Không đổi", "Không xác định"],
+                correct: 0,
+                explanation: "Khi đi từ trên xuống dưới trong một nhóm A, số lớp electron tăng lên làm bán kính nguyên tử tăng dần."
+            },
+            {
+                question: "Kim loại chuyển tiếp đầu tiên trong chu kì 4 là nguyên tố nào?",
+                options: ["Scandium (Sc)", "Titanium (Ti)", "Iron (Fe)", "Zinc (Zn)"],
+                correct: 0,
+                explanation: "Scandium (Sc, Z = 21) là kim loại chuyển tiếp đầu tiên nằm ở đầu chu kì 4 (Block d)."
+            },
+            {
+                question: "Khí hiếm nào có cấu hình electron lớp ngoài cùng chỉ có 2 electron thay vì 8 electron?",
+                options: ["Helium (He)", "Neon (Ne)", "Argon (Ar)", "Krypton (Kr)"],
+                correct: 0,
+                explanation: "Helium (He) có Z = 2, cấu hình 1s², chỉ có 2 electron bão hòa phân lớp 1s nhưng vẫn là khí hiếm trơ bền vững."
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let selectedOptionIndex = null;
+
+        function openQuizModal() {
+            currentQuizIndex = 0;
+            loadQuizQuestion();
+            document.getElementById('quizModal').classList.remove('hidden');
+        }
+
+        function closeQuizModal() {
+            document.getElementById('quizModal').classList.add('hidden');
+        }
+
+        function loadQuizQuestion() {
+            const q = quizList[currentQuizIndex];
+            document.getElementById('quizProgress').textContent = `Nhiệm vụ ${currentQuizIndex + 1} / ${quizList.length}`;
+            document.getElementById('quizTitle').textContent = `Câu hỏi tự học ${currentQuizIndex + 1}`;
+            document.getElementById('quizQuestionText').textContent = q.question;
+            
+            const container = document.getElementById('quizOptionsContainer');
+            container.innerHTML = '';
+            selectedOptionIndex = null;
+            document.getElementById('quizFeedback').textContent = '';
+            document.getElementById('quizExplanationBox').classList.add('hidden');
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3.5 bg-slate-900/80 hover:bg-slate-700/80 border border-slate-700 rounded-xl text-sm font-medium text-white transition flex items-center justify-between';
+                btn.innerHTML = `<span>${String.fromCharCode(65 + idx)}. ${opt}</span>`;
+                btn.onclick = () => selectQuizOption(idx, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectQuizOption(idx, btnElement) {
+            const buttons = document.getElementById('quizOptionsContainer').children;
+            for (let b of buttons) {
+                b.classList.remove('border-rose-500', 'bg-rose-950/40');
+            }
+            btnElement.classList.add('border-rose-500', 'bg-rose-950/40');
+            selectedOptionIndex = idx;
+        }
+
+        function checkQuizAnswer() {
+            if (selectedOptionIndex === null) {
+                alert('Vui lòng chọn một đáp án trước khi kiểm tra!');
+                return;
+            }
+            const q = quizList[currentQuizIndex];
+            const feedback = document.getElementById('quizFeedback');
+            const buttons = document.getElementById('quizOptionsContainer').children;
+
+            if (selectedOptionIndex === q.correct) {
+                feedback.textContent = 'Chính xác! 🎉';
+                feedback.className = 'text-sm font-bold text-emerald-400';
+                buttons[selectedOptionIndex].classList.add('border-emerald-500', 'bg-emerald-950/60');
+            } else {
+                feedback.textContent = 'Chưa chính xác. Thử lại nhé! ❌';
+                feedback.className = 'text-sm font-bold text-rose-400';
+                buttons[selectedOptionIndex].classList.add('border-rose-500', 'bg-rose-950/60');
+                buttons[q.correct].classList.add('border-emerald-500', 'bg-emerald-950/40');
+            }
+
+            document.getElementById('quizExplanationText').textContent = q.explanation;
+            document.getElementById('quizExplanationBox').classList.remove('hidden');
+        }
+
+        function nextQuiz() {
+            if (currentQuizIndex < quizList.length - 1) {
+                currentQuizIndex++;
+                loadQuizQuestion();
+            } else {
+                currentQuizIndex = 0;
+                loadQuizQuestion();
+            }
+        }
+
+        function prevQuiz() {
+            if (currentQuizIndex > 0) {
+                currentQuizIndex--;
+                loadQuizQuestion();
+            } else {
+                currentQuizIndex = quizList.length - 1;
+                loadQuizQuestion();
+            }
+        }
+
+        // Initialize on window load
+        window.onload = function() {
+            renderPeriodicTable();
+        };
+    </script>
+</body>
+</html>
